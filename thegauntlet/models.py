@@ -1,6 +1,6 @@
-from server import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from .db import db
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -26,6 +26,6 @@ class Leaderboard(db.Model):
 
 class Session(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    SessionKey = db.Column(db.String, nullable=False)
+    SessionKey = db.Column(db.String, primary_key=True, unique=True, nullable=False)
 
 

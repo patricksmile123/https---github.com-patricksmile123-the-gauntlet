@@ -56,4 +56,3 @@ def guess():
     response = {"result": result, "guessCount": guessCount}
     return jsonify(response)
 
-        
