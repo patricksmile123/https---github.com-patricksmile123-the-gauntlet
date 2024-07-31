@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';	
+import './App.css';
+
 
 function App() {
 	const [guess, setGuess] = useState("");
@@ -24,7 +25,7 @@ function App() {
 
 	const handleGuess = async () => {
 	  try {
-		if (guess.length != 5){
+		if (guess.length !== 5){
 			return
 		}
 		  console.log("Sending guess:", { guess });
@@ -41,7 +42,7 @@ function App() {
 			  console.log(data);
 			  let tempData = {
 			  }
-			  if (data.result.every(val=>val == "correct")){
+			  if (data.result.every(val=>val === "correct")){
 				setIsWin(true)
 				setDisabled(true)
 			  }

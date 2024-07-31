@@ -4,8 +4,8 @@ from flask_login import LoginManager
 from .db import db
 
 
-
 app = Flask(__name__)
+app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SECRET_KEY'] =  b'WR#&f&+%78er0we=%799eww+#7^90-;s'
 login = LoginManager(app)
 login.login_view = 'login'
@@ -22,3 +22,5 @@ from thegauntlet.models import *
 @app.shell_context_processor
 def make_shell_context():
     return dict(db=db, User=User, Leaderboard=Leaderboard, Session=Session, LoginManager=LoginManager)
+
+from thegauntlet import server
