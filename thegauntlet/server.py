@@ -2,13 +2,13 @@ from flask import Flask, request, jsonify, Response
 import random
 import uuid
 import english_words
-from flask import Flask
 from thegauntlet.models import User, Leaderboard, Session
 from thegauntlet import app
 from flask_cors import CORS, cross_origin
 from thegauntlet.forms import RegistrationForm, LoginForm
 from werkzeug.security import generate_password_hash
 from thegauntlet.db import db
+from flask_wtf.csrf import generate_csrf
 
 
 CORS(app)
@@ -63,11 +63,33 @@ def guess():
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    data = request.get_json
-    if not data or 'username' and 'password' not in data:
+    print("SIGNUP FUNCTION CALLED")
+    data = request.get_json()
+    if not data or 'username' not in data or 'password' not in data:
         return jsonify({"error": "Invalid input"}), 400
-    form = RegistrationForm()
+    
+    form = RegistrationForm(data=data)
+    print(data)
+    print(form.validate_on_submit())
+    print(form.errors)
     if form.validate_on_submit():
-        new_user = User(username=form.username.data, firstname=form.firstname.data, lastname=form.lastname.data, password_hash=generate_password_hash(form.password.data, salt_length=32))
+        print("Form is valid")
+        new_user = User(
+            username=form.username.data,
+            firstname=form.firstname.data,
+            lastname=form.lastname.data,
+            password_hash=generate_password_hash(form.password.data, salt_length=32)
+        )
         db.session.add(new_user)
         db.session.commit()
+        return jsonify({"message": "User created successfully"}), 201
+    else:
+        errors = form.errors
+        return jsonify({'errors': errors}), 400
+
+
+@app.route('/get_csrf_token', methods=['GET'])
+def get_csrf_token():
+    token = generate_csrf()
+    print(token)
+    return jsonify({'csrf_token': token})
