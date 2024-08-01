@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, session
 import random
 import uuid
 import english_words
@@ -9,6 +9,7 @@ from thegauntlet.forms import RegistrationForm, LoginForm
 from werkzeug.security import generate_password_hash
 from thegauntlet.db import db
 from flask_wtf.csrf import generate_csrf
+import base64
 
 
 CORS(app)
@@ -69,9 +70,7 @@ def signup():
         return jsonify({"error": "Invalid input"}), 400
     
     form = RegistrationForm(data=data)
-    print(data)
-    print(form.validate_on_submit())
-    print(form.errors)
+    #print("signup", session['csrf_token'])
     if form.validate_on_submit():
         print("Form is valid")
         new_user = User(
@@ -91,5 +90,6 @@ def signup():
 @app.route('/get_csrf_token', methods=['GET'])
 def get_csrf_token():
     token = generate_csrf()
-    print(token)
-    return jsonify({'csrf_token': token})
+    session['csrf_token'] = token
+    print("get_csrf_token", session['csrf_token'])
+    return jsonify({'csrf_token': session['csrf_token']})

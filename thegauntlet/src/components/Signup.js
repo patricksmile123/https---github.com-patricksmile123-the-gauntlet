@@ -18,6 +18,7 @@ function Signup() {
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
+                console.log(data.csrf_token)
                 setCsrfToken(data.csrf_token);
             } catch (error) {
                 console.error('Error fetching CSRF token:', error);
@@ -26,7 +27,6 @@ function Signup() {
 
         fetchCsrfToken();
     }, []);
-
     const handleSubmit = async (e) => {
         e.preventDefault();  // Prevent the default form submission
         console.log("Using the handleSubmit function");
