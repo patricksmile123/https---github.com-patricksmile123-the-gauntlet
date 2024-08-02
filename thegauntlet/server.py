@@ -1,20 +1,18 @@
 from flask import Flask, request, jsonify, Response, session
 import random
 import uuid
-import english_words
-from thegauntlet.models import User, Leaderboard, Session
+from thegauntlet.models import User, Leaderboard
 from thegauntlet import app
 from flask_cors import CORS, cross_origin
 from thegauntlet.forms import RegistrationForm, LoginForm
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from thegauntlet.db import db
 from flask_wtf.csrf import generate_csrf
-import base64
 
 
 CORS(app)
 # Sample word list
-WORD_LIST = list(english_words.get_english_words_set(['gcide'], lower=True))
+WORD_LIST = open("wordle_words.txt").read().splitlines()
 guessCount = 0
 game = ""
 # Select a random word from the list
@@ -24,15 +22,12 @@ SECRET_WORD = ""
 def createGame():
     global game
     game = uuid.uuid4()
+    global WORD_LIST
     global guessCount
     guessCount = 0
     global SECRET_WORD
     SECRET_WORD = random.choice(WORD_LIST)
-    WORD_LIST.remove(SECRET_WORD)
-    while len(SECRET_WORD) != 5:
-        SECRET_WORD = random.choice(WORD_LIST)
-        WORD_LIST.remove(SECRET_WORD)
-        print(SECRET_WORD)
+    print(SECRET_WORD)
     i = {"game": game}
     return jsonify(i)
 
@@ -93,3 +88,17 @@ def get_csrf_token():
     session['csrf_token'] = token
     print("get_csrf_token", session['csrf_token'])
     return jsonify({'csrf_token': session['csrf_token']})
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    if not data or 'username' not in data or 'password' not in data:
+        return jsonify({"error": "Invalid input"}), 400
+    form = LoginForm(data=data)
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user == None:
+            return jsonify({"error": "User not found"}), 404
+        if check_password_hash(user.password_hash, form.password.data) == False or form.password.data == None:
+            return jsonify({"error": "Invalid Username or Password"}), 400
+        return jsonify({"username": user.username}), 200

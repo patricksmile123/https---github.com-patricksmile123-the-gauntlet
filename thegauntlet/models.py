@@ -6,7 +6,7 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     firstname = db.Column(db.String(20), nullable=False, index=True)
-    lastname = db.Column(db.String(20), nullable=False, unique=True, index=True)
+    lastname = db.Column(db.String(20), nullable=False, index=True)
     username = db.Column(db.String(20), nullable=False, unique=True, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
     db.relationship('Leaderboard', backref='user_id', lazy='dynamic')
@@ -24,8 +24,5 @@ class Leaderboard(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     score = db.Column(db.Integer, nullable=False, default=0)
 
-class Session(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    SessionKey = db.Column(db.String, primary_key=True, unique=True, nullable=False)
 
 

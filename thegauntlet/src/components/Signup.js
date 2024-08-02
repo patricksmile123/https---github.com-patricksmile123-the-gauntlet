@@ -8,34 +8,15 @@ function Signup() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState({});
-    const [csrfToken, setCsrfToken] = useState('');
 
-    useEffect(() => {
-        async function fetchCsrfToken() {
-            try {
-                const response = await fetch('http://127.0.0.1:5000/get_csrf_token');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                console.log(data.csrf_token)
-                setCsrfToken(data.csrf_token);
-            } catch (error) {
-                console.error('Error fetching CSRF token:', error);
-            }
-        }
-
-        fetchCsrfToken();
-    }, []);
     const handleSubmit = async (e) => {
         e.preventDefault();  // Prevent the default form submission
         console.log("Using the handleSubmit function");
         try {
-            const response = await fetch('http://127.0.0.1:5000/signup', {
+            const response = await fetch('/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken  // Add the CSRF token here
                 },
                 body: JSON.stringify({
                     username: username,
@@ -43,7 +24,6 @@ function Signup() {
                     confirmPassword: confirmPassword,
                     firstname: firstname,
                     lastname: lastname,
-                    csrf_token: csrfToken
                 })
             });
             console.log(JSON.stringify({

@@ -1,0 +1,25 @@
+/* Add some basic styling to make sure the form is visible */
+body {
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: #ffffff;
+}
+
+form {
+    margin: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+input {
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 5px 10px;
+}

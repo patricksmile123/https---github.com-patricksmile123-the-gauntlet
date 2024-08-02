@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import Keyboard from './Keyboard';
 
 
 function Wordle() {
@@ -9,6 +10,34 @@ function Wordle() {
     const [isWin, setIsWin] = useState(false)
     const [isDisabled, setDisabled] = useState(false)
     const [gameId, setGameId] = useState("")
+    const [keyDictionary, setKeyDictionary] = useState([
+        { "key": "Q", "state": "" },
+        { "key": "W", "state": "" },
+        { "key": "E", "state": "" },
+        { "key": "R", "state": "" },
+        { "key": "T", "state": "" },
+        { "key": "Y", "state": "" },
+        { "key": "U", "state": "" },
+        { "key": "I", "state": "" },
+        { "key": "O", "state": "" },
+        { "key": "P", "state": "" },
+        { "key": "A", "state": "" },
+        { "key": "S", "state": "" },
+        { "key": "D", "state": "" },
+        { "key": "F", "state": "" },
+        { "key": "G", "state": "" },
+        { "key": "H", "state": "" },
+        { "key": "J", "state": "" },
+        { "key": "K", "state": "" },
+        { "key": "L", "state": "" },
+        { "key": "Z", "state": "" },
+        { "key": "X", "state": "" },
+        { "key": "C", "state": "" },
+        { "key": "V", "state": "" },
+        { "key": "B", "state": "" },
+        { "key": "N", "state": "" },
+        { "key": "M", "state": "" }
+    ]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -38,7 +67,7 @@ function Wordle() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
+            console.log(data);  
             let tempData = {
             }
             if (data.result.every(val=>val === "correct")){
@@ -51,7 +80,13 @@ function Wordle() {
                 setDisabled(true)
             }
             for (let i = 0; i < 5; i++) {
-                    tempData["l"+ i] = {"letter": guess.charAt(i),"result": data.result[i]}
+                    let currentLetter = guess.charAt(i).toUpperCase()
+                    tempData["l"+ i] = {"letter": currentLetter,"result": data.result[i]}
+                    for (let j = 0; j < keyDictionary.length; j++){
+                        if (keyDictionary[j].key.toUpperCase() == currentLetter){
+                            keyDictionary[j].state = data.result[i]
+                            console.log(keyDictionary[j].key)
+                        }
                 }
                 setResult([
                     ...letterData,
@@ -59,16 +94,15 @@ function Wordle() {
                 ])
                 console.log(letterData)
             }
-            else {
-            console.error(`HTTP error! status: ${response.status}`);
-            
         }
-
-
-    } catch (error) {
-        console.error("Error during the guess request", error);
+     } catch (error) {
     }
     };
+    const handleKeyPress = (letter) => { 
+        if (guess.length < 5) {
+            setGuess(`${guess}${letter}` )
+        }
+    }
 
     return (
         <div className="App">
@@ -98,6 +132,7 @@ function Wordle() {
                     <div>Loss</div>
                 ):(<div></div>)}
             </header>
+            <Keyboard keyDictionary={keyDictionary} onKeyPress={handleKeyPress} />
         </div>
     );
 }

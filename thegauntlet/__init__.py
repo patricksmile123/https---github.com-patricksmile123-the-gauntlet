@@ -21,6 +21,6 @@ from thegauntlet.models import *
 
 @app.shell_context_processor
 def make_shell_context():
-    return dict(db=db, User=User, Leaderboard=Leaderboard, Session=Session, LoginManager=LoginManager)
+    return dict(db=db, User=User, Leaderboard=Leaderboard, LoginManager=LoginManager)
 
 from thegauntlet import server
