@@ -8,6 +8,7 @@ from thegauntlet.forms import RegistrationForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from thegauntlet.db import db
 from flask_wtf.csrf import generate_csrf
+from pyjwt import jwt, JWTError
 
 
 CORS(app)
@@ -101,4 +102,5 @@ def login():
             return jsonify({"error": "User not found"}), 404
         if check_password_hash(user.password_hash, form.password.data) == False or form.password.data == None:
             return jsonify({"error": "Invalid Username or Password"}), 400
-        return jsonify({"username": user.username}), 200
+        encoded_jwt = jwt.encode({"username": user.username}, "s{$822Qcg!d*", algorithm="HS256")
+        return jsonify({"username": user.username, "token": encoded_jwt}), 200
