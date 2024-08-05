@@ -1,5 +1,6 @@
 from ast import parse
-from flask import Flask, request, jsonify, Response, session
+from email.policy import default
+from flask import Flask, request, jsonify, Response, session, send_from_directory
 import random
 import uuid
 from thegauntlet.models import User, Game, WordleGuess
@@ -13,6 +14,7 @@ import jwt
 from datetime import datetime
 import traceback
 from sqlalchemy import text
+
 
 CORS(app)
 # Sample word list
@@ -30,7 +32,7 @@ def parseResult(guess, answer):
             result.append('absent')
     return result
 
-@app.route('/createGame', methods=['GET'])
+@app.route('/api/createGame', methods=['GET'])
 def createGame():
     authoHeader = request.headers.get('authorization')
     token = authoHeader.split(" ")[1]
@@ -61,7 +63,7 @@ def createGame():
         return jsonify({"error": "Invalid token"}), 400
 
 
-@app.route('/guess', methods=['POST'])
+@app.route('/api/guess', methods=['POST'])
 @cross_origin()
 def guess():
     authoHeader = request.headers.get('authorization')
@@ -96,7 +98,7 @@ def guess():
         return jsonify({"error": "Invalid token"}), 400
 
 
-@app.route('/signup', methods=['POST'])
+@app.route('/api/signup', methods=['POST'])
 def signup():
     print("SIGNUP FUNCTION CALLED")
     data = request.get_json()
@@ -120,15 +122,7 @@ def signup():
         errors = form.errors
         return jsonify({'errors': errors}), 400
 
-
-@app.route('/get_csrf_token', methods=['GET'])
-def get_csrf_token():
-    token = generate_csrf()
-    session['csrf_token'] = token
-    print("get_csrf_token", session['csrf_token'])
-    return jsonify({'csrf_token': session['csrf_token']})
-
-@app.route('/login', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
     if not data or 'username' not in data or 'password' not in data:
@@ -143,8 +137,15 @@ def login():
         encodedJwt = jwt.encode({"username": user.username}, "s{$822Qcg!d*", algorithm="HS256")
         return jsonify({"username": user.username, "token": encodedJwt}), 200
     
-@app.route('/leaderboard', methods=['GET'])
+@app.route('/api/leaderboard', methods=['GET'])
 def leaderboard():
     leaderboardRows = db.session.execute(text(LEADERBOARD_QUERY)).fetchall()
     leaderboard = [{"firstname": row[0], "averageScore": row[1], "averageTime": row[2], "rank": row[3]} for row in leaderboardRows]
     return jsonify(leaderboard)
+
+@app.route('/', defaults = {'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    if path.startswith('static/') or path.startswith('media/'):
+        return send_from_directory(app.static_folder, path)
+    return send_from_directory(app.static_folder, 'index.html')

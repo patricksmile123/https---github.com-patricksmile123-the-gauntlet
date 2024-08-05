@@ -11,7 +11,7 @@ function Login({setUser}) {
         e.preventDefault();
         console.log("Using the handleSubmit function");
         try {
-            const response = await fetch('/login', {
+            const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

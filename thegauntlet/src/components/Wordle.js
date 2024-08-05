@@ -41,7 +41,7 @@ function Wordle({user}) {
     useEffect(() => {
         const fetchData = async () => {
             console.log("hello")
-        const response = await fetch('/createGame', {
+        const response = await fetch('/api/createGame', {
             method: 'GET',
             headers: { 
                 'authorization': `Bearer ${user.token}`
@@ -76,7 +76,7 @@ function Wordle({user}) {
             return
         }
         console.log("Sending guess:", { guess });
-        const response = await fetch('/guess', {
+        const response = await fetch('/api/guess', {
             method: 'POST',
             headers: {
                 'authorization': `Bearer ${user.token}`,

@@ -4,7 +4,7 @@ from flask_login import LoginManager
 from .db import db
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='build')
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SECRET_KEY'] =  b'WR#&f&+%78er0we=%799eww+#7^90-;s'
 login = LoginManager(app)

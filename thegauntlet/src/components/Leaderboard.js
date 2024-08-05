@@ -8,7 +8,7 @@ const Leaderboard = () => {
         // Fetch leaderboard scores from JSON API
         const fetchScores = async () => {
             try {
-                const response = await fetch('/leaderboard');
+                const response = await fetch('/api/leaderboard');
                 const data = await response.json();
                 setScores(data);
             } catch (error) {
