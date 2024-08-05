@@ -9,7 +9,6 @@ function Wordle({user}) {
     const [isLoss, setIsLoss] = useState(false)
     const [isWin, setIsWin] = useState(false)
     const [isDisabled, setDisabled] = useState(false)
-    const [gameId, setGameId] = useState("")
     const [keyDictionary, setKeyDictionary] = useState([
         { "key": "Q", "state": "" },
         { "key": "W", "state": "" },
@@ -51,7 +50,22 @@ function Wordle({user}) {
         if (response.ok) {
             const data = await response.json();
             console.log(data);
-            setGameId(data.game)
+            setResult(data.map(previousGuess => {
+                console.log(previousGuess);  
+                let tempData = {
+                }
+                for (let i = 0; i < 5; i++) {
+                        let currentLetter = previousGuess.guess.charAt(i).toUpperCase()
+                        tempData["l"+ i] = {"letter": currentLetter,"result": previousGuess.result[i]}
+                        for (let j = 0; j < keyDictionary.length; j++){
+                            if (keyDictionary[j].key.toUpperCase() == currentLetter){
+                                keyDictionary[j].state = previousGuess.result[i]
+                                console.log(keyDictionary[j].key)
+                            }
+                    }
+                }
+                return tempData
+            }));
         }}
         fetchData().catch(console.error);
     }, [])
@@ -68,7 +82,7 @@ function Wordle({user}) {
                 'authorization': `Bearer ${user.token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ guess: guess, gameId: gameId})
+            body: JSON.stringify({ guess: guess})
         });
 
         if (response.ok) {
@@ -122,7 +136,7 @@ function Wordle({user}) {
                     maxLength={5}
                 />
                 <button disabled={isDisabled} onClick={handleGuess}>Submit Guess</button>	
-                <table>{letterData.map(entry => (
+                <table className="guessTable">{letterData.map(entry => (
                     <tr>
                         <td className={entry.l0.result}>{entry.l0.letter}</td>
                         <td className={entry.l1.result}>{entry.l1.letter}</td>

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import './Login.css';
+
 
 function Login({setUser}) {
     const [username, setUsername] = useState('');
@@ -31,7 +33,7 @@ function Login({setUser}) {
     };
 
     return (
-        <div>
+        <div class="loginDiv">
             <h1>Login</h1>
             <form onSubmit={handleSubmit}>
                 <label>

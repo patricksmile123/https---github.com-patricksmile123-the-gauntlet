@@ -1,3 +1,4 @@
+from ast import parse
 from flask import Flask, request, jsonify, Response, session
 import random
 import uuid
@@ -11,10 +12,23 @@ from flask_wtf.csrf import generate_csrf
 import jwt
 from datetime import datetime
 import traceback
+from sqlalchemy import text
 
 CORS(app)
 # Sample word list
 WORD_LIST = open("wordle_words.txt").read().splitlines()
+LEADERBOARD_QUERY = open("leaderboard.sql").read()
+
+def parseResult(guess, answer):
+    result = []
+    for i in range(len(guess)):
+        if guess[i] == answer[i]:
+            result.append('correct')
+        elif guess[i] in answer:
+            result.append('present')
+        else:
+            result.append('absent')
+    return result
 
 @app.route('/createGame', methods=['GET'])
 def createGame():
@@ -23,8 +37,8 @@ def createGame():
     try:
         decodedJwt = jwt.decode(token, "s{$822Qcg!d*", algorithms=["HS256"])
         user = User.query.filter_by(username=decodedJwt['username']).first()
-        currentGame = Game.query.filter_by(user_id=user.user_id).filter_by(outcome=None).first()
-        if currentGame != None:
+        currentGame = Game.query.filter_by(user_id=user.user_id).filter_by(outcome=None).order_by(Game.game_id.desc()).first()
+        if currentGame == None:
             newGame = Game(
                 user_id=user.user_id,
                 start_time=datetime.now(),
@@ -35,8 +49,12 @@ def createGame():
             print(user.username)
             return jsonify(newGame.game_id)
         else:
+            print(currentGame.game_id)
             currentGuesses = WordleGuess.query.filter_by(game_id = currentGame.game_id).order_by(WordleGuess.guess_time.asc()).all()
-            currentGuesses = [guess.guess for guess in currentGuesses]
+            print(currentGuesses)
+            currentGuesses = [{"guess": guess.guess, "result": parseResult(guess.guess, currentGame.answer)} for guess in currentGuesses]
+            print(currentGuesses)
+            return jsonify(currentGuesses)
 
     except:
         print(traceback.format_exc())
@@ -71,14 +89,7 @@ def guess():
             currentGame.end_time = datetime.now()
             currentGame.outcome = "loss"
         db.session.commit()
-        result = []
-        for i in range(len(guess)):
-            if guess[i] == currentGame.answer[i]:
-                result.append('correct')
-            elif guess[i] in currentGame.answer:
-                result.append('present')
-            else:
-                result.append('absent')      
+        result = parseResult(guess, currentGame.answer)
         response = {"result": result, "guessCount": WordleGuess.query.filter_by(game_id=currentGame.game_id).count()}
         return jsonify(response)
     except:
@@ -131,3 +142,9 @@ def login():
             return jsonify({"error": "Invalid Username or Password"}), 400
         encodedJwt = jwt.encode({"username": user.username}, "s{$822Qcg!d*", algorithm="HS256")
         return jsonify({"username": user.username, "token": encodedJwt}), 200
+    
+@app.route('/leaderboard', methods=['GET'])
+def leaderboard():
+    leaderboardRows = db.session.execute(text(LEADERBOARD_QUERY)).fetchall()
+    leaderboard = [{"firstname": row[0], "averageScore": row[1], "averageTime": row[2], "rank": row[3]} for row in leaderboardRows]
+    return jsonify(leaderboard)

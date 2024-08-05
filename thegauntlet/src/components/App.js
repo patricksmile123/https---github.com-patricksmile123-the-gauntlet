@@ -4,7 +4,9 @@ import Wordle from './Wordle';
 import './App.css';
 import Signup from './Signup';
 import Login from './Login';
-
+import Logout from './Logout';	
+import Leaderboard from './Leaderboard';
+import Navbar from './Navbar';
 
 
 function App() {
@@ -15,18 +17,25 @@ function App() {
 		console.log(user)
 	}, [user]);
 	return (
-	  <Router>
-		<Routes>
-		  {!!(user.username) && <>
-		  	<Route path="/wordle" element={<Wordle user={user} />} />
-		  </>}
-		  {!(user.username) && <>
-		  	<Route path="/signup" element={<Signup user={user} />}/>
-		  	<Route path="/login" element={<Login user={user} setUser={setUser}/>}/>
-		  </>}
-		  <Route path="*" element={<Navigate user={user} to={!!(user.username) ? "/wordle" : "/login"}/>} /> 
-		</Routes>
-	  </Router>
+		<><Navbar setUser={setUser}/>
+		
+	  <div className="content">
+		<Router>
+			<Routes>
+				<Route path="/leaderboard" element={<Leaderboard />} />
+			{!!(user.username) && <>
+				<Route path="/wordle" element={<Wordle user={user} />} />
+				<Route path="/logout" element={<Logout setUser={setUser} />} />
+			</>}
+			{!(user.username) && <>
+				<Route path="/signup" element={<Signup user={user} />}/>
+				<Route path="/login" element={<Login user={user} setUser={setUser}/>}/>
+			</>}
+			<Route path="*" element={<Navigate user={user} to={!!(user.username) ? "/wordle" : "/login"}/>} /> 
+			</Routes>
+		</Router>
+	  </div>
+	  </>
 	);
   }
 
