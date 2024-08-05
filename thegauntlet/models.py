@@ -9,8 +9,8 @@ class User(UserMixin, db.Model):
     lastname = db.Column(db.String(20), nullable=False, index=True)
     username = db.Column(db.String(20), nullable=False, unique=True, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
-    db.relationship('Leaderboard', backref='user_id', lazy='dynamic')
-    db.relationship('Session', backref='user_id', lazy='dynamic')
+    db.relationship('Game', backref='user_id', lazy='dynamic')
+    
     
     
     def set_password(self, password):
@@ -19,10 +19,20 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
-class Leaderboard(db.Model):
+class Game(db.Model):
+    __tablename__ = 'games'
     game_id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    score = db.Column(db.Integer, nullable=False, default=0)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=True)
+    outcome = db.Column(db.String(10), nullable=True)
+    answer = db.Column(db.String(10), nullable=False)
 
+class WordleGuess(db.Model):
+    __tablename__ = 'wordle_guess'
+    guess_id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    game_id = db.Column(db.Integer, db.ForeignKey('games.game_id'), nullable=False)
+    guess = db.Column(db.String(10), nullable=False)
+    guess_time = db.Column(db.DateTime, nullable=False)
 
 

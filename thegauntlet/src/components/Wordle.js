@@ -3,7 +3,7 @@ import './App.css';
 import Keyboard from './Keyboard';
 
 
-function Wordle() {
+function Wordle({user}) {
     const [guess, setGuess] = useState("");
     const [letterData, setResult] = useState([]);
     const [isLoss, setIsLoss] = useState(false)
@@ -42,7 +42,12 @@ function Wordle() {
     useEffect(() => {
         const fetchData = async () => {
             console.log("hello")
-        const response = await fetch('http://127.0.0.1:5000/createGame');
+        const response = await fetch('/createGame', {
+            method: 'GET',
+            headers: { 
+                'authorization': `Bearer ${user.token}`
+            },
+        });
         if (response.ok) {
             const data = await response.json();
             console.log(data);
@@ -57,9 +62,10 @@ function Wordle() {
             return
         }
         console.log("Sending guess:", { guess });
-        const response = await fetch('http://127.0.0.1:5000/guess', {
+        const response = await fetch('/guess', {
             method: 'POST',
             headers: {
+                'authorization': `Bearer ${user.token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ guess: guess, gameId: gameId})

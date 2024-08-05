@@ -9,7 +9,11 @@ import Login from './Login';
 
 function App() {
 	const [user, setUser] = useState({});
-	useEffect(() => {console.log(user)}, [user]);
+	useEffect(() => {
+		JSON.stringify(user) === "{}" && localStorage.getItem("user") && setUser(JSON.parse(localStorage.getItem("user")))
+		JSON.stringify(user) !== "{}" && localStorage.setItem("user", JSON.stringify(user))
+		console.log(user)
+	}, [user]);
 	return (
 	  <Router>
 		<Routes>

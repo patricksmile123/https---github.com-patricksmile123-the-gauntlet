@@ -46,6 +46,7 @@ function Signup() {
             } else {
                 const data = await response.json();
                 console.log('Success:', data);
+                window.location.href = '/login';
                 // Handle success (e.g., redirect to another page or update the UI)
             }
         } catch (error) {
