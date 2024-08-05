@@ -2,14 +2,18 @@ import React from 'react';
 import './Navbar.css';
 
 const Navbar = ({user, setUser}) => {
+    const logout = () => {
+        setUser({});
+        localStorage.removeItem("user");
+    }
     return (
         <nav className='navbar'>
             <ul>
-                <li><a href="/wordle">Play</a></li>
+                {user.username && <li><a href="/wordle">Play</a></li>}
                 <li><a href="/leaderboard">Leaderboard</a></li>
-                <li><a href="/login">Login</a></li>
-                <li><a href="/signup">Signup</a></li>
-                <li><a href="/logout">Logout</a></li>
+                {!user.username && <li><a href="/login">Login</a></li>}
+                {!user.username && <li><a href="/signup">Signup</a></li>}
+                {user.username && <li onClick={logout}><a>Logout</a></li>}
             </ul>
         </nav>
     );

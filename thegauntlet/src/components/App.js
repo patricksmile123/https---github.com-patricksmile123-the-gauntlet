@@ -17,7 +17,7 @@ function App() {
 		console.log(user)
 	}, [user]);
 	return (
-		<><Navbar setUser={setUser}/>
+		<><Navbar user={user} setUser={setUser}/>
 		
 	  <div className="content">
 		<Router>
@@ -25,7 +25,6 @@ function App() {
 				<Route path="/leaderboard" element={<Leaderboard />} />
 			{!!(user.username) && <>
 				<Route path="/wordle" element={<Wordle user={user} />} />
-				<Route path="/logout" element={<Logout setUser={setUser} />} />
 			</>}
 			{!(user.username) && <>
 				<Route path="/signup" element={<Signup user={user} />}/>
